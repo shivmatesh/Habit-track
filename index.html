@@ -1,647 +1,648 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>90 Days Cook Session Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .handwritten {
-            font-family: 'Patrick Hand', cursive;
-        }
-        .checkbox-wrapper input:checked + div {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-        .checkbox-wrapper input:checked + div svg {
-            display: block;
-        }
-        .task-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .task-item.completed {
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.5s ease-in-out;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c7c7c7; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8; 
-        }
-        .modal-enter {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-        .modal-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        .modal-exit {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .modal-exit-active {
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        /* Animation for quote */
-        .quote-fade {
-            animation: fadeInUp 0.8s ease-out;
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>90 Days Cook Session Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f3f4f6;
+      background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .handwritten { font-family: "Patrick Hand", cursive; }
+    .checkbox-wrapper input:checked + div { background-color: #10b981; border-color: #10b981; }
+    .checkbox-wrapper input:checked + div svg { display: block; }
+    .task-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .task-item.completed { opacity: 0.6; text-decoration: line-through; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+    .quote-fade { animation: fadeInUp 0.8s ease-out; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body class="text-gray-800 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow-sm sticky top-0 z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <h1 class="text-xl font-bold tracking-tight text-gray-900">90 Days <span class="text-indigo-600">Cook Session</span></h1>
-                </div>
-                <div class="text-sm text-gray-500 hidden sm:block">
-                    Current Streak: <span id="streak-display" class="font-bold text-orange-500">0</span> Days
-                </div>
-            </div>
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-3">
+          <div class="bg-indigo-600 text-white p-2 rounded-lg">
+            <i class="fas fa-fire"></i>
+          </div>
+          <h1 class="text-xl font-bold tracking-tight text-gray-900">90 Days <span class="text-indigo-600">Cook Session</span></h1>
         </div>
-    </nav>
+        <div class="text-sm text-gray-500 hidden sm:block">
+          Current Streak: <span id="streak-display" class="font-bold text-orange-500">0</span> Days
+        </div>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <!-- Left Column: Daily Tracker -->
-        <div class="lg:col-span-7 space-y-6">
-            
-            <!-- Date Header -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-gray-500 uppercase tracking-wider font-semibold">Today</p>
-                    <h2 class="text-3xl font-bold text-gray-800 mt-1" id="current-date-display">Loading...</h2>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm text-gray-500">Day Progress</p>
-                    <div class="text-2xl font-bold text-indigo-600" id="day-progress-text">0/0</div>
-                </div>
-            </div>
+  <!-- Main -->
+  <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Left -->
+    <div class="lg:col-span-7 space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex justify-between items-center">
+        <div>
+          <p id="date-label" class="text-sm text-gray-500 uppercase tracking-wider font-semibold">Selected Day</p>
+          <h2 class="text-3xl font-bold text-gray-800 mt-1" id="current-date-display">--</h2>
+        </div>
+        <div class="text-right flex flex-col gap-2 items-end">
+          <div>
+            <p class="text-sm text-gray-500">Day Progress</p>
+            <div class="text-2xl font-bold text-indigo-600" id="day-progress-text">0/0</div>
+          </div>
+          <button onclick="openSettings()" class="text-xs bg-gray-900 hover:bg-black text-white px-3 py-1.5 rounded-lg">
+            <i class="fas fa-gear mr-1"></i>Settings
+          </button>
+        </div>
+      </div>
 
-            <!-- Tasks Container -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                    <h3 class="text-lg font-semibold text-gray-800">Daily Tasks</h3>
-                    <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium" id="requirement-badge">Need 3/4</span>
-                </div>
-                
-                <div class="p-6">
-                    <ul id="task-list" class="space-y-3">
-                        <!-- Tasks injected here -->
-                    </ul>
-
-                    <!-- Add Task Input -->
-                    <div class="mt-6 flex gap-2">
-                        <input type="text" id="new-task-input" placeholder="Add a new task (e.g., Read 10 pages)..." 
-                            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all">
-                        <button onclick="addTask()" 
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
-                            <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dynamic Motivation Card -->
-            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden group">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
-                <div class="relative z-10">
-                    <h3 class="text-xl font-bold mb-2 flex items-center gap-2">
-                        <i class="fas fa-quote-left text-indigo-200"></i>
-                        Daily Wisdom
-                    </h3>
-                    <p class="text-indigo-100 text-lg italic quote-fade" id="daily-quote">"The journey of a thousand miles begins with one step."</p>
-                    <p class="text-indigo-200 text-sm mt-2 text-right">— Ancient Proverb</p>
-                </div>
-            </div>
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800">Daily Tasks</h3>
+          <div class="flex items-center gap-2">
+            <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium" id="requirement-badge">Need 3/4</span>
+            <button onclick="redoSelectedDay()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-full font-medium">Redo Day</button>
+          </div>
         </div>
 
-        <!-- Right Column: 90 Day Grid -->
-        <div class="lg:col-span-5 space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
-                <div class="flex justify-between items-end mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">Session Map</h3>
-                        <p class="text-sm text-gray-500">Track your 90 day journey</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-900" id="total-completed-days">0</div>
-                        <div class="text-xs text-gray-500 uppercase">Days Completed</div>
-                    </div>
-                </div>
+        <div class="p-6">
+          <ul id="task-list" class="space-y-3"></ul>
 
-                <!-- Grid -->
-                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-6 xl:grid-cols-7 gap-2 overflow-y-auto max-h-[600px] pr-2" id="days-grid">
-                    <!-- Days injected here -->
-                </div>
-                
-                <div class="mt-6 pt-6 border-t border-gray-100">
-                    <div class="flex items-center justify-between text-sm text-gray-600">
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-gray-200"></div>
-                            <span>Pending</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                            <span>Completed</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-indigo-600"></div>
-                            <span>Today</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <div class="mt-6 flex gap-2">
+            <input type="text" id="new-task-input" placeholder="Add a new task..."
+              class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" />
+            <button onclick="addTask()"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+              <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add</span>
+            </button>
+          </div>
         </div>
-    </main>
+      </div>
 
-    <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 relative z-10 transform transition-all scale-90 opacity-0" id="modal-content">
-            <div class="text-center">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl animate-bounce">
-                    <i class="fas fa-check"></i>
-                </div>
-                <h2 class="text-3xl font-bold text-gray-800 mb-2 handwritten text-4xl">Yoo Shivmatesh!</h2>
-                <p class="text-gray-600 text-lg mb-4">You have successfully completed <span class="font-bold text-indigo-600" id="modal-day-number">Day X</span>.</p>
-                
-                <!-- New Quote Section in Modal -->
-                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-4 border border-indigo-100">
-                    <p class="text-indigo-800 italic text-sm mb-2" id="modal-quote">"Believe in yourself!"</p>
-                    <p class="text-indigo-600 font-semibold text-xs uppercase tracking-wide">You can also do it further, be confident!</p>
-                </div>
-                
-                <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
-                    <p class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-1">Current Streak</p>
-                    <p class="text-2xl font-bold text-gray-800" id="modal-streak">5 Days</p>
-                </div>
-
-                <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">
-                    Continue Journey
-                </button>
-            </div>
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <h3 class="text-xl font-bold mb-2 flex items-center gap-2">
+            <i class="fas fa-quote-left text-indigo-200"></i>
+            Daily Wisdom
+          </h3>
+          <p class="text-indigo-100 text-lg italic quote-fade" id="daily-quote">"The journey of a thousand miles begins with one step."</p>
+          <p class="text-indigo-200 text-sm mt-2 text-right">— Lao Tzu</p>
         </div>
+      </div>
     </div>
 
-    <script>
-        // --- 90 Different Motivational Quotes ---
-        const quotes = [
-            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-            { text: "Your limitation—it's only your imagination.", author: "Unknown" },
-            { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },
-            { text: "Great things never come from comfort zones.", author: "Unknown" },
-            { text: "Dream it. Wish it. Do it.", author: "Unknown" },
-            { text: "Success doesn't just find you. You have to go out and get it.", author: "Unknown" },
-            { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
-            { text: "Dream bigger. Do bigger.", author: "Unknown" },
-            { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" },
-            { text: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
-            { text: "Do something today that your future self will thank you for.", author: "Unknown" },
-            { text: "Little things make big days.", author: "Unknown" },
-            { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-            { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
-            { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-            { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
-            { text: "Opportunities don't happen. You create them.", author: "Chris Grosser" },
-            { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
-            { text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt" },
-            { text: "Creativity is intelligence having fun.", author: "Albert Einstein" },
-            { text: "What you get by achieving your goals is not as important as what you become by achieving your goals.", author: "Zig Ziglar" },
-            { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
-            { text: "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart.", author: "Roy T. Bennett" },
-            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-            { text: "Hardships often prepare ordinary people for an extraordinary destiny.", author: "C.S. Lewis" },
-            { text: "Believe in yourself. You are braver than you think, more talented than you know, and capable of more than you imagine.", author: "Roy T. Bennett" },
-            { text: "I learned that courage was not the absence of fear, but the triumph over it.", author: "Nelson Mandela" },
-            { text: "The man who has confidence in himself gains the confidence of others.", author: "Hasidic Proverb" },
-            { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
-            { text: "Be the change that you wish to see in the world.", author: "Mahatma Gandhi" },
-            { text: "Happiness is not something ready made. It comes from your own actions.", author: "Dalai Lama" },
-            { text: "If you want to lift yourself up, lift up someone else.", author: "Booker T. Washington" },
-            { text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis" },
-            { text: "A person who never made a mistake never tried anything new.", author: "Albert Einstein" },
-            { text: "The best way to predict the future is to create it.", author: "Peter Drucker" },
-            { text: "We generate fears while we sit. We overcome them by action.", author: "Dr. Henry Link" },
-            { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson" },
-            { text: "Go confidently in the direction of your dreams. Live the life you have imagined.", author: "Henry David Thoreau" },
-            { text: "When you reach the end of your rope, tie a knot in it and hang on.", author: "Franklin D. Roosevelt" },
-            { text: "Don't judge each day by the harvest you reap but by the seeds that you plant.", author: "Robert Louis Stevenson" },
-            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-            { text: "Your time is limited, so don't waste it living someone else's life.", author: "Steve Jobs" },
-            { text: "Winning isn't everything, but wanting to win is.", author: "Vince Lombardi" },
-            { text: "I have not failed. I've just found 10,000 ways that won't work.", author: "Thomas A. Edison" },
-            { text: "Motivation is what gets you started. Habit is what keeps you going.", author: "Jim Ryun" },
-            { text: "People who are crazy enough to think they can change the world, are the ones who do.", author: "Rob Siltanen" },
-            { text: "We become what we think about.", author: "Earl Nightingale" },
-            { text: "An unexamined life is not worth living.", author: "Socrates" },
-            { text: "Eighty percent of success is showing up.", author: "Woody Allen" },
-            { text: "Winners never quit and quitters never win.", author: "Vince Lombardi" },
-            { text: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
-            { text: "Every noble work is at first impossible.", author: "Thomas Carlyle" },
-            { text: "If you're going through hell, keep going.", author: "Winston Churchill" },
-            { text: "Don't wait. The time will never be just right.", author: "Napoleon Hill" },
-            { text: "Everything has beauty, but not everyone can see.", author: "Confucius" },
-            { text: "How wonderful it is that nobody need wait a single moment before starting to improve the world.", author: "Anne Frank" },
-            { text: "When you cease to dream you cease to live.", author: "Malcolm Forbes" },
-            { text: "A good plan violently executed now is better than a perfect plan executed next week.", author: "George Patton" },
-            { text: "The mind is everything. What you think you become.", author: "Buddha" },
-            { text: "I have been impressed with the urgency of doing. Knowing is not enough; we must apply.", author: "Leonardo da Vinci" },
-            { text: "If you hear a voice within you say 'you cannot paint,' then by all means paint and that voice will be silenced.", author: "Vincent Van Gogh" },
-            { text: "There is only one way to avoid criticism: do nothing, say nothing, and be nothing.", author: "Aristotle" },
-            { text: "Ask and it will be given to you; search, and you will find.", author: "Matthew 7:7" },
-            { text: "The only person you should try to be better than is the person you were yesterday.", author: "Anonymous" },
-            { text: "Never give up on a dream just because of the time it will take to accomplish it. The time will pass anyway.", author: "Earl Nightingale" },
-            { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
-            { text: "The difference between ordinary and extraordinary is that little extra.", author: "Jimmy Johnson" },
-            { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
-            { text: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller" },
-            { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
-            { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford" },
-            { text: "The only way to achieve the impossible is to believe it is possible.", author: "Charles Kingsleigh" },
-            { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein" },
-            { text: "Two roads diverged in a wood, and I—I took the one less traveled by, And that has made all the difference.", author: "Robert Frost" },
-            { text: "I attribute my success to this: I never gave or took any excuse.", author: "Florence Nightingale" },
-            { text: "You are the artist of your own life. Don't hand the paintbrush to anyone else.", author: "Unknown" },
-            { text: "The comeback is always stronger than the setback.", author: "Unknown" },
-            { text: "Stay patient and trust your journey.", author: "Unknown" },
-            { text: "Good things come to people who wait, but better things come to those who go out and get them.", author: "Unknown" },
-            { text: "If it doesn't challenge you, it won't change you.", author: "Unknown" },
-            { text: "The pain you feel today will be the strength you feel tomorrow.", author: "Unknown" }
-        ];
+    <!-- Right -->
+    <div class="lg:col-span-5 space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">Session Map</h3>
+            <p class="text-sm text-gray-500">Unlocked days are clickable</p>
+          </div>
+          <div class="text-right">
+            <div class="text-3xl font-bold text-gray-900" id="total-completed-days">0</div>
+            <div class="text-xs text-gray-500 uppercase">Days Completed</div>
+          </div>
+        </div>
 
-        // --- State Management ---
-        let state = {
-            startDate: new Date('2026-03-11'),
-            currentDate: new Date(),
-            tasks: [
-                { id: 1, text: "Wake up at 5:30 AM", completed: false },
-                { id: 2, text: "Go to College", completed: false },
-                { id: 3, text: "Code or Learn for 1:30 Hrs", completed: false },
-                { id: 4, text: "Type for 30 Minutes", completed: false }
-            ],
-            history: {},
-            shownModalForToday: false // Prevent glitchy re-popup
-        };
+        <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-6 xl:grid-cols-7 gap-2 overflow-y-auto max-h-[600px] pr-2" id="days-grid"></div>
 
-        // Initialize history with some dummy data
-        function initHistory() {
-            const today = new Date();
-            for (let i = 1; i < 10; i++) {
-                const d = new Date(state.startDate);
-                d.setDate(d.getDate() + i);
-                if (d < today) {
-                    const dateStr = formatDateKey(d);
-                    if (Math.random() > 0.3) {
-                        state.history[dateStr] = { completed: true, tasksCompleted: 4, totalTasks: 4 };
-                    } else {
-                        state.history[dateStr] = { completed: false, tasksCompleted: 1, totalTasks: 4 };
-                    }
-                }
-            }
-        }
+        <div class="mt-6 pt-6 border-t border-gray-100">
+          <div class="flex items-center justify-between text-sm text-gray-600">
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-gray-200"></div><span>Pending</span></div>
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div><span>Completed</span></div>
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-300"></div><span>Selected</span></div>
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-gray-300"></div><span>Locked</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-        // --- Helpers ---
-        function formatDateKey(date) {
-            return date.toISOString().split('T')[0];
-        }
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 relative z-10 transform transition-all scale-90 opacity-0" id="modal-content">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl animate-bounce">
+          <i class="fas fa-check"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2 handwritten text-4xl">Yoo Shivmatesh!</h2>
+        <p class="text-gray-600 text-lg mb-4">You have successfully completed <span class="font-bold text-indigo-600" id="modal-day-number">Day X</span>.</p>
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-4 border border-indigo-100">
+          <p class="text-indigo-800 italic text-sm mb-2" id="modal-quote">"Believe in yourself!"</p>
+          <p class="text-indigo-600 font-semibold text-xs uppercase tracking-wide">You can also do it further, be confident!</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+          <p class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-1">Current Streak</p>
+          <p class="text-2xl font-bold text-gray-800" id="modal-streak">0 Days</p>
+        </div>
+        <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">
+          Continue Journey
+        </button>
+      </div>
+    </div>
+  </div>
 
-        function getDayNumber() {
-            const diffTime = Math.abs(new Date() - state.startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            return Math.min(diffDays, 90);
-        }
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60" onclick="closeSettings()"></div>
+    <div class="relative z-10 bg-white w-full max-w-md rounded-2xl p-6 mx-4 shadow-2xl">
+      <h3 class="text-xl font-bold mb-4">Challenge Settings</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-600">Start Date</label>
+          <input id="settings-start-date" type="date" class="w-full mt-1 border rounded-lg px-3 py-2">
+        </div>
+        <div>
+          <label class="text-sm text-gray-600">Current Day (1-90)</label>
+          <input id="settings-current-day" type="number" min="1" max="90" class="w-full mt-1 border rounded-lg px-3 py-2">
+        </div>
+      </div>
+      <div class="mt-5 flex gap-2 justify-end">
+        <button onclick="closeSettings()" class="px-4 py-2 rounded-lg border">Cancel</button>
+        <button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white">Save</button>
+      </div>
+    </div>
+  </div>
 
-        function getRequirement() {
-            const total = state.tasks.length;
-            return total > 0 ? total - 1 : 0;
-        }
+  <script>
+    const STORAGE_KEY = "cook90_tracker_v4";
+    const SETTINGS_START_KEY = "challenge_start_date";
+    const SETTINGS_DAY_KEY = "challenge_current_day";
 
-        function getQuoteForDay(dayNum) {
-            // Use modulo to cycle through quotes if day > 90
-            const index = (dayNum - 1) % quotes.length;
-            return quotes[index];
-        }
+    const quotes = [
+      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+      { text: "Your limitation—it's only your imagination.", author: "Unknown" },
+      { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },
+      { text: "Great things never come from comfort zones.", author: "Unknown" },
+      { text: "Dream it. Wish it. Do it.", author: "Unknown" },
+      { text: "Success doesn't just find you. You have to go out and get it.", author: "Unknown" },
+      { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
+      { text: "Dream bigger. Do bigger.", author: "Unknown" },
+      { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" }
+    ];
 
-        // --- Core Logic ---
+    const defaultTasks = [
+      { id: 1, text: "Wake up at 5:30 AM" },
+      { id: 2, text: "Go to College" },
+      { id: 3, text: "Code or Learn for 1:30 Hrs" },
+      { id: 4, text: "Type for 30 Minutes" }
+    ];
 
-        function checkDayCompletion() {
-            const completedCount = state.tasks.filter(t => t.completed).length;
-            const required = getRequirement();
-            const total = state.tasks.length;
-            
-            document.getElementById('day-progress-text').innerText = `${completedCount}/${total}`;
-            document.getElementById('requirement-badge').innerText = `Need ${required}/${total}`;
+    let state = {
+      startDate: new Date(),
+      selectedDate: new Date(),
+      tasksMaster: [...defaultTasks],
+      dayTasks: {},
+      history: {},
+      popupShownForKey: null
+    };
 
-            const todayKey = formatDateKey(new Date());
-            const wasAlreadyCompleted = state.history[todayKey] && state.history[todayKey].completed;
+    function formatDateKey(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d.toISOString().split("T")[0];
+    }
 
-            // Only trigger if newly completed (not already in history) and not already shown modal
-            if (completedCount >= required && !wasAlreadyCompleted && total > 0 && !state.shownModalForToday) {
-                state.shownModalForToday = true; // Lock to prevent glitch
-                
-                state.history[todayKey] = {
-                    completed: true,
-                    tasksCompleted: completedCount,
-                    totalTasks: total
-                };
-                
-                triggerCelebration(getDayNumber());
-                updateStats();
-                renderGrid();
-            } else {
-                if (total > 0) {
-                    state.history[todayKey] = {
-                        completed: wasAlreadyCompleted, // Keep true if already true
-                        tasksCompleted: completedCount,
-                        totalTasks: total
-                    };
-                }
-                updateStats();
-                renderGrid();
-            }
-        }
+    function parseDateInput(str) {
+      if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
+      const d = new Date(str + "T00:00:00");
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
 
-        function triggerCelebration(dayNum) {
-            // Confetti
-            var duration = 3 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+    function getSelectedDateKey() {
+      return formatDateKey(state.selectedDate);
+    }
 
-            var random = function(min, max) {
-              return Math.random() * (max - min) + min;
-            }
+    function getDayNumberForDate(dateObj) {
+      const start = new Date(state.startDate);
+      const target = new Date(dateObj);
+      start.setHours(0, 0, 0, 0);
+      target.setHours(0, 0, 0, 0);
+      const diff = Math.floor((target - start) / (1000 * 60 * 60 * 24)) + 1;
+      return Math.max(1, Math.min(90, diff));
+    }
 
-            var interval = setInterval(function() {
-              var timeLeft = animationEnd - Date.now();
-              if (timeLeft <= 0) {
-                return clearInterval(interval);
-              }
-              var particleCount = 50 * (timeLeft / duration);
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+    function getRequirement(total) {
+      return total > 0 ? total - 1 : 0;
+    }
 
-            // Show Modal with specific quote
-            const modal = document.getElementById('success-modal');
-            const content = document.getElementById('modal-content');
-            
-            // Get specific quote for this day
-            const quote = getQuoteForDay(dayNum);
-            document.getElementById('modal-day-number').innerText = `Day ${dayNum}`;
-            document.getElementById('modal-quote').innerText = `"${quote.text}"`;
-            
-            // Calculate streak
-            let streak = 0;
-            let d = new Date();
-            while(true) {
-                const key = formatDateKey(d);
-                if (state.history[key] && state.history[key].completed) {
-                    streak++;
-                    d.setDate(d.getDate() - 1);
-                } else {
-                    // Check if today is the one we just added
-                    if (formatDateKey(d) === todayKey && state.history[todayKey] && state.history[todayKey].completed) {
-                        streak++;
-                        d.setDate(d.getDate() - 1);
-                    } else {
-                        break;
-                    }
-                }
-            }
-            document.getElementById('modal-streak').innerText = `${streak} Day${streak !== 1 ? 's' : ''}`;
+    function getQuoteForDay(dayNum) {
+      return quotes[(dayNum - 1) % quotes.length];
+    }
 
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-90', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
+    function cloneMasterTasksUnchecked() {
+      return state.tasksMaster.map(t => ({ ...t, completed: false }));
+    }
 
-        function closeModal() {
-            const modal = document.getElementById('success-modal');
-            const content = document.getElementById('modal-content');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-90', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
+    function ensureDayTasks(key) {
+      if (!state.dayTasks[key]) state.dayTasks[key] = cloneMasterTasksUnchecked();
+      const existing = new Map(state.dayTasks[key].map(t => [t.id, t]));
+      state.dayTasks[key] = state.tasksMaster.map(t => ({
+        id: t.id,
+        text: t.text,
+        completed: existing.get(t.id)?.completed ?? false
+      }));
+    }
 
-        function toggleTask(id) {
-            const task = state.tasks.find(t => t.id === id);
-            if (task) {
-                task.completed = !task.completed;
-                renderTasks();
-                checkDayCompletion();
-            }
-        }
+    function getCurrentTasks() {
+      const key = getSelectedDateKey();
+      ensureDayTasks(key);
+      return state.dayTasks[key];
+    }
 
-        function addTask() {
-            const input = document.getElementById('new-task-input');
-            const text = input.value.trim();
-            if (text) {
-                state.tasks.push({
-                    id: Date.now(),
-                    text: text,
-                    completed: false
-                });
-                input.value = '';
-                renderTasks();
-                checkDayCompletion();
-            }
-        }
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        startDate: formatDateKey(state.startDate),
+        selectedDate: formatDateKey(state.selectedDate),
+        tasksMaster: state.tasksMaster,
+        dayTasks: state.dayTasks,
+        history: state.history
+      }));
+    }
 
-        function deleteTask(id) {
-            state.tasks = state.tasks.filter(t => t.id !== id);
-            renderTasks();
-            checkDayCompletion();
-        }
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        state.startDate = parseDateInput(data.startDate) || state.startDate;
+        state.selectedDate = parseDateInput(data.selectedDate) || state.selectedDate;
+        state.tasksMaster = (Array.isArray(data.tasksMaster) && data.tasksMaster.length) ? data.tasksMaster : [...defaultTasks];
+        state.dayTasks = data.dayTasks || {};
+        state.history = data.history || {};
+      } catch {}
+    }
 
-        // --- Rendering ---
+    function getLastUnlockedDay() {
+      let unlocked = 1;
+      for (let i = 1; i <= 90; i++) {
+        const d = new Date(state.startDate);
+        d.setDate(d.getDate() + (i - 1));
+        const key = formatDateKey(d);
+        if (state.history[key]?.completed) unlocked = i + 1;
+        else break;
+      }
+      return Math.min(90, unlocked);
+    }
 
-        function renderTasks() {
-            const list = document.getElementById('task-list');
-            list.innerHTML = '';
+    function isDaySelectable(dayNum) {
+      return dayNum <= getLastUnlockedDay();
+    }
 
-            state.tasks.forEach(task => {
-                const li = document.createElement('li');
-                li.className = `task-item flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md ${task.completed ? 'completed bg-gray-50' : ''}`;
-                
-                li.innerHTML = `
-                    <div class="flex items-center gap-4 flex-1 cursor-pointer" onclick="toggleTask(${task.id})">
-                        <div class="checkbox-wrapper relative w-6 h-6">
-                            <input type="checkbox" class="absolute opacity-0 w-full h-full cursor-pointer" ${task.completed ? 'checked' : ''}>
-                            <div class="w-6 h-6 border-2 border-gray-300 rounded-md transition-colors flex items-center justify-center bg-white">
-                                <svg class="w-4 h-4 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                        </div>
-                        <span class="text-gray-700 font-medium select-none">${task.text}</span>
-                    </div>
-                    <button onclick="deleteTask(${task.id})" class="text-gray-300 hover:text-red-500 transition-colors p-2">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                `;
-                list.appendChild(li);
-            });
-        }
+    function selectDayByNumber(dayNum) {
+      if (!isDaySelectable(dayNum)) return;
+      const d = new Date(state.startDate);
+      d.setDate(d.getDate() + (dayNum - 1));
+      state.selectedDate = d;
+      state.popupShownForKey = null;
+      updateDateDisplay();
+      updateDailyQuote();
+      renderTasks();
+      renderGrid();
+      checkDayCompletion(false);
+      saveState();
+    }
 
-        function renderGrid() {
-            const grid = document.getElementById('days-grid');
-            grid.innerHTML = '';
-            
-            const todayKey = formatDateKey(new Date());
+    function redoSelectedDay() {
+      const key = getSelectedDateKey();
+      ensureDayTasks(key);
+      state.dayTasks[key] = state.dayTasks[key].map(t => ({ ...t, completed: false }));
+      state.history[key] = { completed: false, tasksCompleted: 0, totalTasks: state.dayTasks[key].length };
+      state.popupShownForKey = null;
+      renderTasks();
+      renderGrid();
+      updateStats();
+      checkDayCompletion(false);
+      saveState();
+    }
 
-            for (let i = 1; i <= 90; i++) {
-                const d = new Date(state.startDate);
-                d.setDate(d.getDate() + (i - 1));
-                const dateKey = formatDateKey(d);
-                
-                const isToday = dateKey === todayKey;
-                const historyEntry = state.history[dateKey];
-                const isCompleted = historyEntry && historyEntry.completed;
-                const isPast = d < new Date() && !isToday;
+    function showPopup(dayNum) {
+      const modal = document.getElementById("success-modal");
+      const content = document.getElementById("modal-content");
+      const quote = getQuoteForDay(dayNum);
 
-                const dayEl = document.createElement('div');
-                dayEl.className = `
-                    aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-bold cursor-default transition-all
-                    ${isToday ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 scale-110 shadow-lg z-10' : 
-                      isCompleted ? 'bg-green-500 text-white shadow-sm' : 
-                      isPast ? 'bg-gray-200 text-gray-400' : 'bg-white border border-gray-200 text-gray-400'}
-                `;
-                
-                dayEl.innerHTML = `
-                    <span class="opacity-70 text-[10px] mb-0.5">Day</span>
-                    <span>${i}</span>
-                `;
-                
-                if (isCompleted) {
-                    dayEl.innerHTML += `<i class="fas fa-check text-[10px] mt-0.5 opacity-80"></i>`;
-                }
+      document.getElementById("modal-day-number").innerText = `Day ${dayNum}`;
+      document.getElementById("modal-quote").innerText = `"${quote.text}"`;
 
-                grid.appendChild(dayEl);
-            }
-        }
+      let streak = 0;
+      for (let i = 1; i <= 90; i++) {
+        const d = new Date(state.startDate);
+        d.setDate(d.getDate() + (i - 1));
+        const key = formatDateKey(d);
+        if (state.history[key]?.completed) streak++;
+        else break;
+      }
+      document.getElementById("modal-streak").innerText = `${streak} Day${streak !== 1 ? "s" : ""}`;
 
-        function updateStats() {
-            const completedDays = Object.values(state.history).filter(h => h.completed).length;
-            document.getElementById('total-completed-days').innerText = completedDays;
-            
-            let streak = 0;
-            let d = new Date();
-            d.setHours(0,0,0,0);
-            
-            let checkDate = new Date(d);
-            let key = formatDateKey(checkDate);
-            
-            if (!state.history[key] || !state.history[key].completed) {
-                 checkDate.setDate(checkDate.getDate() - 1);
-            }
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        content.classList.remove("scale-90", "opacity-0");
+        content.classList.add("scale-100", "opacity-100");
+      }, 10);
 
-            while(true) {
-                key = formatDateKey(checkDate);
-                if (state.history[key] && state.history[key].completed) {
-                    streak++;
-                    checkDate.setDate(checkDate.getDate() - 1);
-                } else {
-                    break;
-                }
-            }
-            document.getElementById('streak-display').innerText = streak;
-        }
+      const end = Date.now() + 1200;
+      const timer = setInterval(() => {
+        if (Date.now() >= end) return clearInterval(timer);
+        confetti({ particleCount: 25, spread: 70, origin: { y: 0.6 } });
+      }, 180);
+    }
 
-        function updateDateDisplay() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('en-US', options);
-        }
+    function closeModal() {
+      const modal = document.getElementById("success-modal");
+      const content = document.getElementById("modal-content");
+      content.classList.remove("scale-100", "opacity-100");
+      content.classList.add("scale-90", "opacity-0");
+      setTimeout(() => modal.classList.add("hidden"), 250);
+    }
 
-        function updateDailyQuote() {
-            const dayNum = getDayNumber();
-            const quote = getQuoteForDay(dayNum);
-            const quoteEl = document.getElementById('daily-quote');
-            
-            // Add animation class
-            quoteEl.classList.remove('quote-fade');
-            void quoteEl.offsetWidth; // Trigger reflow
-            quoteEl.classList.add('quote-fade');
-            
-            quoteEl.innerText = `"${quote.text}"`;
-            quoteEl.nextElementSibling.innerText = `— ${quote.author}`;
-        }
+    function checkDayCompletion(showPopupOnTransition = true) {
+      const key = getSelectedDateKey();
+      const tasks = getCurrentTasks();
 
-        // --- Initialization ---
-        const todayKey = formatDateKey(new Date());
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            initHistory();
-            updateDateDisplay();
-            updateDailyQuote();
-            renderTasks();
-            renderGrid();
-            
-            // Check if today was already completed before loading
-            if (state.history[todayKey] && state.history[todayKey].completed) {
-                state.shownModalForToday = true;
-            }
-            
-            checkDayCompletion();
-            updateStats();
+      const completedCount = tasks.filter(t => t.completed).length;
+      const total = tasks.length;
+      const required = getRequirement(total);
+      const wasCompleted = !!state.history[key]?.completed;
+      const nowCompleted = completedCount >= required && total > 0;
 
-            document.getElementById('new-task-input').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    addTask();
-                }
-            });
-        });
+      document.getElementById("day-progress-text").innerText = `${completedCount}/${total}`;
+      document.getElementById("requirement-badge").innerText = `Need ${required}/${total}`;
 
-    </script>
+      state.history[key] = { completed: nowCompleted, tasksCompleted: completedCount, totalTasks: total };
+
+      if (showPopupOnTransition && !wasCompleted && nowCompleted && state.popupShownForKey !== key) {
+        state.popupShownForKey = key;
+        showPopup(getDayNumberForDate(state.selectedDate));
+      }
+
+      updateStats();
+      renderGrid();
+      saveState();
+    }
+
+    function toggleTask(id) {
+      const key = getSelectedDateKey();
+      ensureDayTasks(key);
+      const task = state.dayTasks[key].find(t => t.id === id);
+      if (!task) return;
+      task.completed = !task.completed;
+      renderTasks();
+      checkDayCompletion(true);
+    }
+
+    function addTask() {
+      const input = document.getElementById("new-task-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const id = Date.now();
+      state.tasksMaster.push({ id, text });
+      Object.keys(state.dayTasks).forEach(dayKey => {
+        state.dayTasks[dayKey].push({ id, text, completed: false });
+      });
+
+      input.value = "";
+      renderTasks();
+      checkDayCompletion(false);
+      saveState();
+    }
+
+    function deleteTask(id) {
+      state.tasksMaster = state.tasksMaster.filter(t => t.id !== id);
+      Object.keys(state.dayTasks).forEach(dayKey => {
+        state.dayTasks[dayKey] = state.dayTasks[dayKey].filter(t => t.id !== id);
+      });
+      renderTasks();
+      checkDayCompletion(false);
+      saveState();
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("task-list");
+      list.innerHTML = "";
+      const tasks = getCurrentTasks();
+
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.className = `task-item flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md ${task.completed ? "completed bg-gray-50" : ""}`;
+        li.innerHTML = `
+          <div class="flex items-center gap-4 flex-1 cursor-pointer" onclick="toggleTask(${task.id})">
+            <div class="checkbox-wrapper relative w-6 h-6">
+              <input type="checkbox" class="absolute opacity-0 w-full h-full cursor-pointer" ${task.completed ? "checked" : ""}>
+              <div class="w-6 h-6 border-2 border-gray-300 rounded-md transition-colors flex items-center justify-center bg-white">
+                <svg class="w-4 h-4 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-gray-700 font-medium select-none">${task.text}</span>
+          </div>
+          <button onclick="deleteTask(${task.id})" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("days-grid");
+      grid.innerHTML = "";
+      const selectedKey = getSelectedDateKey();
+      const unlocked = getLastUnlockedDay();
+
+      for (let i = 1; i <= 90; i++) {
+        const d = new Date(state.startDate);
+        d.setDate(d.getDate() + (i - 1));
+        const key = formatDateKey(d);
+        const isSelected = key === selectedKey;
+        const isCompleted = !!state.history[key]?.completed;
+        const isLocked = i > unlocked;
+
+        const dayEl = document.createElement("div");
+        dayEl.className = `
+          aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-bold transition-all
+          ${isSelected ? "ring-4 ring-amber-200 scale-105 border-2 border-amber-500 bg-amber-50 text-amber-700" :
+            isCompleted ? "bg-green-500 text-white shadow-sm cursor-pointer" :
+            isLocked ? "bg-gray-100 text-gray-300 border border-gray-200 cursor-not-allowed" :
+            "bg-white border border-gray-200 text-gray-500 cursor-pointer"}
+        `;
+        dayEl.innerHTML = `
+          <span class="opacity-70 text-[10px] mb-0.5">Day</span>
+          <span>${i}</span>
+          ${isCompleted ? '<i class="fas fa-check text-[10px] mt-0.5 opacity-80"></i>' : ""}
+          ${isLocked ? '<i class="fas fa-lock text-[10px] mt-0.5 opacity-70"></i>' : ""}
+        `;
+        if (!isLocked) dayEl.onclick = () => selectDayByNumber(i);
+        grid.appendChild(dayEl);
+      }
+    }
+
+    function updateStats() {
+      const completedDays = Object.values(state.history).filter(h => h.completed).length;
+      document.getElementById("total-completed-days").innerText = completedDays;
+
+      let streak = 0;
+      for (let i = 1; i <= 90; i++) {
+        const d = new Date(state.startDate);
+        d.setDate(d.getDate() + (i - 1));
+        const key = formatDateKey(d);
+        if (state.history[key]?.completed) streak++;
+        else break;
+      }
+      document.getElementById("streak-display").innerText = streak;
+    }
+
+    function updateDateDisplay() {
+      const dateEl = document.getElementById("current-date-display");
+      const labelEl = document.getElementById("date-label");
+      if (!dateEl || !labelEl) return;
+
+      const dayNum = getDayNumberForDate(state.selectedDate);
+      labelEl.innerText = dayNum === 1 ? "Start Day" : `Selected Day ${dayNum}`;
+      dateEl.innerText = state.selectedDate.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    }
+
+    function updateDailyQuote() {
+      const dayNum = getDayNumberForDate(state.selectedDate);
+      const quote = getQuoteForDay(dayNum);
+      const quoteEl = document.getElementById("daily-quote");
+      quoteEl.classList.remove("quote-fade");
+      void quoteEl.offsetWidth;
+      quoteEl.classList.add("quote-fade");
+      quoteEl.innerText = `"${quote.text}"`;
+      quoteEl.nextElementSibling.innerText = `— ${quote.author}`;
+    }
+
+    // Settings UI
+    function openSettings() {
+      const modal = document.getElementById("settings-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.getElementById("settings-start-date").value = formatDateKey(state.startDate);
+      document.getElementById("settings-current-day").value = getDayNumberForDate(state.selectedDate);
+    }
+
+    function closeSettings() {
+      const modal = document.getElementById("settings-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function saveSettings() {
+      const startInput = document.getElementById("settings-start-date").value;
+      const dayInput = parseInt(document.getElementById("settings-current-day").value, 10);
+
+      const parsedStart = parseDateInput(startInput);
+      if (!parsedStart) {
+        alert("Invalid start date. Use YYYY-MM-DD.");
+        return;
+      }
+
+      const safeDay = Math.max(1, Math.min(90, Number.isNaN(dayInput) ? 1 : dayInput));
+
+      localStorage.setItem(SETTINGS_START_KEY, formatDateKey(parsedStart));
+      localStorage.setItem(SETTINGS_DAY_KEY, String(safeDay));
+
+      state.startDate = parsedStart;
+      state.selectedDate = new Date(parsedStart);
+      state.selectedDate.setDate(state.selectedDate.getDate() + (safeDay - 1));
+
+      state.dayTasks = {};
+      state.history = {};
+      state.popupShownForKey = null;
+      state.tasksMaster = [...defaultTasks];
+
+      saveState();
+      updateDateDisplay();
+      updateDailyQuote();
+      renderTasks();
+      renderGrid();
+      checkDayCompletion(false);
+      updateStats();
+      closeSettings();
+    }
+
+    function initSettingsDefaults() {
+      let start = localStorage.getItem(SETTINGS_START_KEY);
+      let day = localStorage.getItem(SETTINGS_DAY_KEY);
+
+      if (!start) {
+        start = formatDateKey(new Date()); // default today
+        localStorage.setItem(SETTINGS_START_KEY, start);
+      }
+      if (!day) {
+        day = "1";
+        localStorage.setItem(SETTINGS_DAY_KEY, day);
+      }
+
+      const parsedStart = parseDateInput(start) || new Date();
+      const parsedDay = Math.max(1, Math.min(90, parseInt(day, 10) || 1));
+
+      state.startDate = parsedStart;
+      state.selectedDate = new Date(parsedStart);
+      state.selectedDate.setDate(state.selectedDate.getDate() + (parsedDay - 1));
+    }
+
+    function resetAllProgress() {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SETTINGS_START_KEY);
+      localStorage.removeItem(SETTINGS_DAY_KEY);
+      location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initSettingsDefaults();
+      loadState();
+
+      // keep configured start date from settings as source of truth
+      const configuredStart = parseDateInput(localStorage.getItem(SETTINGS_START_KEY));
+      if (configuredStart) state.startDate = configuredStart;
+
+      updateDateDisplay();
+      updateDailyQuote();
+      renderTasks();
+      renderGrid();
+      checkDayCompletion(false);
+      updateStats();
+
+      document.getElementById("new-task-input").addEventListener("keypress", e => {
+        if (e.key === "Enter") addTask();
+      });
+
+      // expose for inline onclick
+      window.toggleTask = toggleTask;
+      window.addTask = addTask;
+      window.deleteTask = deleteTask;
+      window.redoSelectedDay = redoSelectedDay;
+      window.closeModal = closeModal;
+      window.openSettings = openSettings;
+      window.closeSettings = closeSettings;
+      window.saveSettings = saveSettings;
+      window.resetAllProgress = resetAllProgress;
+    });
+  </script>
 </body>
 </html>
